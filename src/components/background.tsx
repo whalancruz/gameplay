@@ -13,11 +13,11 @@ export function Background({ children, style }: Props) {
         <LinearGradient colors={[theme.colors.secondary80, theme.colors.secondary100]} style={[styles.container, style]} >
             {children}
         </LinearGradient>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
     }
 });

@@ -1,8 +1,7 @@
 import { TouchableOpacity, Text, View, Image, StyleSheet, TouchableOpacityProps } from "react-native";
-
 import { theme } from "../styles/style";
-import ImageDiscord from "../assets/discord.png";
 
+import ImageDiscord from "../assets/discord.png";
 export interface IButtonDiscordProps extends TouchableOpacityProps {
     title: string
 };

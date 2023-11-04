@@ -4,13 +4,12 @@ import { GestureHandlerRootView, RectButton, RectButtonProps } from "react-nativ
 import { theme } from "../styles/style";
 import { SvgProps } from "react-native-svg";
 
-
 type Props = RectButtonProps & {
     title: string;
     icon: React.FC<SvgProps>;
     hasCheckBox?: boolean;
     checked?: boolean;
-}
+};
 
 export function Category({
     title,

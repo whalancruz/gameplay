@@ -1,8 +1,13 @@
-import { ReactNode, createContext, useContext, useMemo, useState } from "react"
-import { User } from "../types/user";
+import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from "react"
+import { StorageKeys } from "../enums/storage";
+import { api } from "../services/api.services";
+import { IUser } from "../interfaces/user.interfaces";
 
-type AuthContextData = {
-    user: User;
+import Storage from "../utils/storage";
+
+export type AuthContextData = {
+    user: IUser;
+    setUser: (user: IUser) => void;
 };
 
 type Props = {
@@ -10,11 +15,27 @@ type Props = {
 };
 
 export function AuthProvider({ children }: Props) {
-    const [user, setUser] = useState<User>({} as User);
+    const [user, setUser] = useState<IUser>({} as IUser);
 
     const authContextValue = useMemo(() => {
-        return { user };
+        return {
+            user,
+            setUser
+        };
     }, [user]);
+
+
+    useEffect(() => {
+        async function getUserStorage() {
+            let userStorage = await Storage.get(StorageKeys.gameplay_user) as IUser;
+            if (userStorage) {
+                api.defaults.headers.common.Authorization = `Bearer ${userStorage.token}`;
+                setUser(userStorage);
+            };
+        };
+        getUserStorage();
+    }, [])
+
 
     return (
         <AuthContext.Provider value={authContextValue}>

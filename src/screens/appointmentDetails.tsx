@@ -1,65 +1,93 @@
-import { StyleSheet, View, Image, Text, FlatList } from "react-native";
+import { StyleSheet, View, Image, Text, FlatList, Share, Platform } from "react-native";
 import { Header } from "../components/header";
-
-import imageBanner from "../assets/banner.png";
 import { theme } from "../styles/style";
 import { ListHeader } from "../components/listHeader";
 import { Members } from "../components/members";
 import { ListDivider } from "../components/listDivider";
 import { Background } from "../components/background";
 import { ButtonDiscord } from "../components/buttonDiscord";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
+import { IAppointment } from "../interfaces/appointment.interfaces";
+import { useCallback, useState } from "react";
+import { api } from "../services/api.services";
+import { IGuildWidget } from "../interfaces/guilds.interfaces";
+
+import imageBanner from "../assets/banner.png";
+
+import * as Linking from 'expo-linking';
+
+type Params = {
+    appointment: IAppointment;
+};
 
 export function AppointmentDetails() {
+    const [guildWidget, setGuildWidget] = useState<IGuildWidget>({} as IGuildWidget);
 
-    let listTeste = [
-        {
-            id: '1'
-        },
-        {
-            id: '2'
-        },
-        {
-            id: '3'
-        },
-        {
-            id: '4'
-        }
-    ]
+    const route = useRoute();
+    const { appointment } = route.params as Params;
+
+    useFocusEffect(useCallback(() => {
+        fetchGuildInfo();
+    }, []));
+
+    async function fetchGuildInfo() {
+        await api.get(`/guilds/${appointment.guild.id}/widget.json`).then(response => {
+            let guildsWidget = response.data as IGuildWidget;
+            setGuildWidget(guildsWidget);
+        });
+    };
+
+    function handleShared() {
+        let message = Platform.OS === "ios" ? `Junte-se á ${appointment.guild.name}` : guildWidget.instant_invite;
+
+        Share.share({
+            message,
+            url: guildWidget.instant_invite
+        });
+    };
+
+    function handleOpen() {
+        Linking.openURL(guildWidget.instant_invite);
+    };
 
     return (
         <Background>
             <View style={styles.container}>
-                <Header layoutBack={true} showShared={true} title="Lendários" />
+                <Header dynamicShared={handleShared} layoutBack={true} showShared={appointment.guild.owner} title={appointment.guild.name} />
 
                 <View style={styles.containerHeader}>
                     <Image style={styles.imageBanner} source={imageBanner} />
 
                     <View style={styles.containerHeaderInfo}>
                         <Text style={styles.titleInfo}>
-                            League of Legends
+                            {appointment.guild.name}
                         </Text>
                         <Text style={styles.subTitleInfo}>
-                            É hoje que vamos chegar ao challenger sem {'\n'}
-                            perder uma partida da md10
+                            {appointment.description}
                         </Text>
                     </View>
 
                 </View>
 
                 <View style={styles.containerMembers}>
-                    <ListHeader style={styles.listHeader} title="Jogadores" subtitle="Total 3" />
+                    <ListHeader style={styles.listHeader} title="Jogadores" subtitle={`Total ${guildWidget.presence_count}`} />
 
                     <FlatList
                         keyExtractor={(item) => item.id}
-                        data={listTeste}
+                        data={guildWidget.members}
                         showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{paddingBottom: 20}}
                         ItemSeparatorComponent={() => <ListDivider style={{ marginVertical: 10 }} />}
                         renderItem={({ item }) => (
-                            <Members />
+                            <Members data={item} />
                         )}
                     />
 
-                    <ButtonDiscord style={{ marginVertical: 25 }} title="Entrar no servidor do Discord" />
+                    {
+                        appointment.guild.owner && (
+                            <ButtonDiscord onPress={handleOpen} style={{ marginVertical: 25 }} title="Entrar no servidor do Discord" />
+                        )
+                    }
 
                 </View>
 
@@ -70,7 +98,8 @@ export function AppointmentDetails() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        backgroundColor: theme.colors.secondary100
     },
     containerHeader: {
         width: "100%"

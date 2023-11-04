@@ -1,7 +1,7 @@
 import { View, StyleSheet, ViewProps } from 'react-native';
 import { theme } from '../styles/style';
 
-export function ListDivider({  style }: ViewProps){
+export function ListDivider({ style }: ViewProps){
   return (
     <View 
       style={[

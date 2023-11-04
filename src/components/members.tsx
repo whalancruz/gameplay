@@ -1,23 +1,28 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Image } from "react-native";
 import { theme } from "../styles/style";
+import { IMembers } from "../interfaces/members.interfaces";
 
-export function Members() {
+type Props = {
+    data: IMembers;
+};
+
+export function Members({ data }: Props) {
+    let isOnline = (data.status === "online");
+
     return (
         <View style={styles.container}>
 
-            <View>
-                <LinearGradient style={styles.moldura} colors={[theme.colors.secondary50, theme.colors.secondary70]} >
-
-                </LinearGradient>
-            </View>
+            <LinearGradient style={styles.moldura} colors={[theme.colors.secondary50, theme.colors.secondary70]} >
+                <Image style={styles.imageMember} source={{ uri: data.avatar_url }} />
+            </LinearGradient>
 
             <View style={styles.containerRigth}>
-                <Text style={styles.title}>Whalan Cruz</Text>
+                <Text style={styles.title}>{data.username}</Text>
 
                 <View style={styles.containerStatus}>
-                    <Text style={[styles.dotStatus, { backgroundColor: theme.colors.on }]} />
-                    <Text style={styles.titleStatus}>Disponivel</Text>
+                    <View style={[styles.dotStatus, { backgroundColor: (isOnline) ? theme.colors.on : theme.colors.primary }]} />
+                    <Text style={styles.titleStatus}>{isOnline ? "Disponivel" : "Ocupado"}</Text>
                 </View>
             </View>
 
@@ -35,9 +40,16 @@ const styles = StyleSheet.create({
         paddingLeft: 20
     },
     moldura: {
-        width: 64,
-        height: 68,
+        width: 80,
+        height: 80,
         padding: 2,
+        borderRadius: 7,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    imageMember: {
+        width: 75,
+        height: 75,
         borderRadius: 7
     },
     title: {
@@ -53,7 +65,7 @@ const styles = StyleSheet.create({
     dotStatus: {
         width: 10,
         height: 10,
-        borderRadius: 100
+        borderRadius: 10
     },
     titleStatus: {
         fontFamily: theme.fonts.text400,

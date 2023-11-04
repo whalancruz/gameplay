@@ -1,43 +1,51 @@
 
 
 
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Image } from "react-native";
 import { theme } from "../styles/style";
 import { LinearGradient } from "expo-linear-gradient";
 import { ListHeader } from "./listHeader";
 import { AntDesign } from '@expo/vector-icons';
-import PlayerSvg from '../assets/player.svg';
 import { GestureHandlerRootView, RectButton, RectButtonProps } from "react-native-gesture-handler";
+import { IAppointment } from "../interfaces/appointment.interfaces";
+import { format, parseISO } from 'date-fns';
+import { ptBR } from "date-fns/locale";
+
+import PlayerSvg from '../assets/player.svg';
 
 type Props = RectButtonProps & {
+    data: IAppointment;
+};
 
-}
+export function Appointment({ data, ...rest }: Props) {
 
-export function Appointment({ ...rest }: Props) {
+    function handleFormatDate(date: Date): string {
+        const dataFormatada = format(parseISO(date.toString()), "E dd/MM 'às' HH:mm", { locale: ptBR });
+        return String(dataFormatada);
+    };
+
     return (
         <GestureHandlerRootView>
             <RectButton {...rest}>
                 <View style={styles.container}>
 
-                    <View>
-                        <LinearGradient style={styles.moldura} colors={[theme.colors.secondary50, theme.colors.secondary70]} >
-
-                        </LinearGradient>
-                    </View>
+                    <LinearGradient style={styles.moldura} colors={[theme.colors.secondary50, theme.colors.secondary70]} >
+                        <Image style={styles.imageGuild} source={{ uri: data.guild.iconUrl }} />
+                    </LinearGradient>
 
                     <View style={styles.containerRigth}>
-                        <ListHeader title="Lendários" subtitle="Ranqueada" />
-                        <Text style={styles.title}>League of Legends</Text>
+                        <ListHeader title={data.guild.name} subtitle={data.category.title} />
+                        <Text style={styles.title}>{data.guild.owner ? 'Administrador' : 'Convidado'}</Text>
                         <View style={styles.containerInfo}>
                             <View style={styles.containerDateInfo}>
                                 <AntDesign name="calendar" size={15} color={theme.colors.primary} />
                                 <Text style={styles.titleInfo}>
-                                    Sex 18/06 às 21:00h
+                                    {handleFormatDate(data.date)}
                                 </Text>
                             </View>
                             <View style={styles.containerOnPeoples}>
                                 <PlayerSvg fill={theme.colors.primary} />
-                                <Text style={styles.numberOnlys}>3</Text>
+                                <Text style={styles.numberOnlys}>{data.membersOnly}</Text>
                             </View>
                         </View>
                     </View>
@@ -58,10 +66,12 @@ const styles = StyleSheet.create({
         paddingLeft: 20
     },
     moldura: {
-        width: 64,
-        height: 68,
+        width: 80,
+        height: 80,
         padding: 2,
-        borderRadius: 7
+        borderRadius: 7,
+        justifyContent: "center",
+        alignItems: "center"
     },
     title: {
         fontSize: 13,
@@ -95,5 +105,10 @@ const styles = StyleSheet.create({
     },
     titleInfoIcon: {
         marginRight: 30
+    },
+    imageGuild: {
+        width: 75,
+        height: 75,
+        borderRadius: 7
     }
 });

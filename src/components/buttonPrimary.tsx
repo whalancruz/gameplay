@@ -1,18 +1,17 @@
 import { StyleSheet, Text, View } from "react-native";
 import { RectButton, GestureHandlerRootView, RectButtonProps } from "react-native-gesture-handler";
-
 import { theme } from "../styles/style";
 import { ReactNode } from "react";
 
 export interface IButtonPrimaryProps extends RectButtonProps {
     title?: string;
     icon?: ReactNode;
-}
+};
 
-export function ButtonPrimary({ title, icon, style }: IButtonPrimaryProps) {
+export function ButtonPrimary({ title, icon, style, ...rest }: IButtonPrimaryProps) {
     return (
         <GestureHandlerRootView>
-            <RectButton style={[styles.container, style]}>
+            <RectButton style={[styles.container, style]}  {...rest}>
                 {
                     icon && <View>{icon}</View>
                 }
@@ -20,13 +19,20 @@ export function ButtonPrimary({ title, icon, style }: IButtonPrimaryProps) {
                     title && <Text style={styles.title}>{title}</Text>
                 }
             </RectButton>
-        </GestureHandlerRootView>
+        </GestureHandlerRootView >
     )
 }
 
 const styles = StyleSheet.create({
     container: {
         backgroundColor: theme.colors.primary,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 7,
+        width: 50,
+        height: 50
+    },
+    containerButton: {
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 7,
